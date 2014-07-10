@@ -79,7 +79,6 @@ class HtmlToText {
      * @return string the HTML converted or empty string if not able to parse
      */
     function convert() {
-        // $html = $this->standardizeNewlines($this->html);
         $output = '';
         $success = $this->document->loadHTML($this->html);
         if ($success) {
@@ -115,7 +114,7 @@ class HtmlToText {
         } else {
             $children = $node->childNodes;
             // If this has children
-            if ($children !== null && $children->length > 0) {
+            if (($children !== null) && ($children->length > 0)) {
                 $precededByBlock = false;
                 foreach ($children as $child) {
                     // What child are we looking at?
