@@ -1,7 +1,11 @@
-html2text
+#HtmlToText
 =========
+[![Build Status](https://travis-ci.org/apt142/Colorizr.svg?branch=master)](https://travis-ci.org/apt142/Colorizr)
 
-html2text is a very simple script that uses PHP's DOM methods to load from HTML, and then iterates over the resulting DOM to correctly output plain text. For example:
+html2text is a very simple script that uses PHP's DOM methods to load from HTML,
+ and then iterates over the resulting DOM to output plain text.
+
+ Example:
 
 ```html
 <html>
@@ -40,7 +44,7 @@ within a div
 [A link](http://foo.com)
 ```
 
-See the [original blog post](http://journals.jevon.org/users/jevon-phd/entry/19818) or the related [StackOverflow answer](http://stackoverflow.com/a/2564472/39531).
+This is a fork of: (https://github.com/soundasleep/html2text)
 
 ## Installing
 
@@ -57,9 +61,12 @@ You can use [Composer](http://getcomposer.org/) to add the [package](https://pac
 And then use it quite simply:
 
 ```php
-$text = convert_html_to_text($html);
+$converter = new \HtmlToText\HtmlToText($html);
+$text = $converter->convert();
+
+// Or
+
+$converter = new \HtmlToText\HtmlToText();
+$convertor->set($html);
+$text = $converter->convert();
 ```
-
-## Tests
-
-Some very basic tests are provided in the `tests/` directory. Run them with `php -f run.php`.

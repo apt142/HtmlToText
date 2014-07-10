@@ -38,7 +38,7 @@ class HtmlToText {
     /** @var string $html */
     private $html = null;
 
-    /** @var DOMDocument $domDoc */
+    /** @var \DOMDocument $domDoc */
     private $document = null;
 
     // Ignore these tags
@@ -98,7 +98,7 @@ class HtmlToText {
     /**
      * Standardize newlines into one convention. (Unix)
      *
-     * @param string text text with any number of \r, \r\n and \n combinations
+     * @param string $text text with any number of \r, \r\n and \n combinations
      *
      * @return string the fixed text
      */
@@ -111,22 +111,21 @@ class HtmlToText {
     /**
      * Render a node
      *
-     * @param \DOMNode $node      Dom Node
-     * @param bool     $preceeded Preceded by a sibling block element
+     * @param \DOMNode $node     Dom Node
+     * @param bool     $preceded Preceded by a sibling block element
      *
      * @return string
      */
-    private function render(\DOMNode $node, $preceeded = false) {
+    private function render(\DOMNode $node, $preceded = false) {
         $output = '';
         $tag = $node->nodeName;
         $lastChild = '';
         // echo $node->nodeName. "\n";
         if ($tag == '#text') {
             // Convert two or more white space characters into a single
-            $output = preg_replace('/\s/u', ' ', $node->wholeText);
-            $output = preg_replace('/\s{2,}/u', ' ', $output);
+            $output = $this->cleanText($node->wholeText);
             // $output = preg_replace("/[\\t\\n\\v\\f\\r ]+/im", " ", $node->wholeText);
-        } elseif ($node instanceof DOMDocumentType) {
+        } elseif ($node instanceof \DOMDocumentType) {
             $output = "";
         } else {
             $children = $node->childNodes;
@@ -142,20 +141,24 @@ class HtmlToText {
                 }
             }
         }
-        $output = $this->prefix($node, $preceeded) . $output
-            .  $this->postFix($node, $lastChild);
+        $output = $this->prefix($node, $preceded)
+            . $output
+            .  $this->postFix(
+                $node,
+                ($this->isBlock($lastChild) && $this->isBlock($tag))
+            );
         return $output;
     }
 
     /**
      * Determines prefix for tag
      *
-     * @param DOMNode $node      Dom Node
-     * @param bool    $preceeded This element is preceeded by another block.
+     * @param \DOMNode $node      Dom Node
+     * @param bool     $preceded This element is preceeded by another block.
      *
      * @return string
      */
-    private function prefix($node, $preceeded = false) {
+    private function prefix($node, $preceded = false) {
         $name = strtolower($node->nodeName);
         $output = '';
         switch ($name) {
@@ -175,7 +178,7 @@ class HtmlToText {
                 $output = "\n";
                 break;
             case "div":
-                if (!$preceeded) {
+                if (!$preceded) {
                     $output = "\n";
                 }
                 break;
@@ -205,11 +208,12 @@ class HtmlToText {
     /**
      * Determines postfix for node
      *
-     * @param DOMNode $node Dom Node
+     * @param \DOMNode $node     Dom Node
+     * @param bool     $parented Parent is a block element
      *
      * @return string
      */
-    private function postFix($node) {
+    private function postFix($node, $parented = false) {
         $name = strtolower($node->nodeName);
         $output = '';
         switch ($name) {
@@ -226,12 +230,12 @@ class HtmlToText {
             case "tr":
             case "br":
             case "p":
-                $output = "\n";
+            case "div":
+                if (!$parented) {
+                    $output = "\n";
+                }
                 break;
 
-            case "div":
-                $output = "\n";
-                break;
             case "td":
                 $output = ' ';
                 break;
@@ -259,12 +263,26 @@ class HtmlToText {
                     }
                 }
                 break;
+
             default:
                 $output = "";
                 break;
         }
 
         return $output;
+    }
+
+    /**
+     * Cleans white space by removing carriage returns and consolidating
+     * spacing
+     *
+     * @param string $text Text to clean
+     *
+     * @return string
+     */
+    private function cleanText($text) {
+        $text = preg_replace('/\s/u', ' ', $text);
+        return preg_replace('/\s{2,}/u', ' ', $text);
     }
 
     /**
