@@ -82,13 +82,10 @@ class HtmlToText {
         $output = '';
         $success = $this->document->loadHTML($this->html);
         if ($success) {
-            $output = $this->render($this->document);
+            $output = trim($this->render($this->document));
 
             // Trim each line
-            $lines = explode("\n", trim($output));
-            foreach ($lines as $index => $line) {
-                $lines[$index] = trim($line);
-            }
+            $lines = array_map('trim', explode("\n", $output));
             $output = implode("\n", $lines);
         }
         return $output;
