@@ -96,19 +96,6 @@ class HtmlToText {
     }
 
     /**
-     * Standardize newlines into one convention. (Unix)
-     *
-     * @param string $text text with any number of \r, \r\n and \n combinations
-     *
-     * @return string the fixed text
-     */
-    private function standardizeNewlines($text) {
-        $text = str_replace("\r\n", "\n", $text);
-        $text = str_replace("\r", "\n", $text);
-        return $text;
-    }
-
-    /**
      * Render a node
      *
      * @param \DOMNode $node     Dom Node
