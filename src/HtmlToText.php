@@ -9,7 +9,7 @@
  * PHP version 5.3
  *
  * @category Colorizr
- * @package default
+ * @package  Default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
  * @link     http://apartment142.com
@@ -26,7 +26,7 @@ namespace HtmlToText;
  * PHP version 5.3
  *
  * @category Colorizr
- * @package default
+ * @package  Default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
  * @link     http://apartment142.com
