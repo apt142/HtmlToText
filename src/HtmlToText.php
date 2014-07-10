@@ -1,0 +1,280 @@
+<?php
+/**
+ * htmlToText Converter
+ *
+ * This is a derivative work of this repo: https://github.com/soundasleep/html2text
+ *
+ * Refactored to be object oriented and properly namespaced.
+ *
+ * PHP version 5.3
+ *
+ * @category Colorizr
+ * @package default
+ * @author   Cris Bettis <apt142@apartment142.com>
+ * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
+ * @link     http://apartment142.com
+ * @see      https://github.com/soundasleep/html2text
+ */
+
+namespace HtmlToText;
+
+/**
+ * htmlToText Converter
+ *
+ * Converts html input into a plain text output that is suitable to read.
+ *
+ * PHP version 5.3
+ *
+ * @category Colorizr
+ * @package default
+ * @author   Cris Bettis <apt142@apartment142.com>
+ * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
+ * @link     http://apartment142.com
+ * @see      https://github.com/soundasleep/html2text
+ */
+
+
+class HtmlToText {
+    /** @var string $html */
+    private $html = null;
+
+    /** @var DOMDocument $domDoc */
+    private $document = null;
+
+    // Ignore these tags
+    private $ignoreTags = array("style", "head", "title", "meta", "script",
+        'canvas', 'embed', 'video', 'audio');
+    private $blockElements = array('article', 'header', 'aside',
+        'hgroup', 'blockquote', 'hr', 'li', 'map', 'ol', 'caption', 'output',
+        'p', 'pre', 'dd', 'progress', 'div', 'section', 'dl', 'table', 'dt',
+        'tbody', 'embed', 'textarea', 'fieldset', 'tfoot', 'figcaption',
+        'footer', 'tr', 'form', 'ul', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6');
+
+    /**
+     * Constructor
+     *
+     * @param string|null $html HTML string to translate (optional)
+     *
+     * @return \HtmlToText\HtmlToText
+     */
+    public function __construct($html = null) {
+        $this->setHtml($html);
+        $this->document = new \DOMDocument();
+    }
+
+    /**
+     * Sets the HTML string to work on.
+     *
+     * @param string $html HTML String
+     *
+     * @return void
+     */
+    public function setHtml($html) {
+        $this->html = $html;
+    }
+
+    /**
+     * Tries to converts the given HTML into a plain text format
+     *
+     * @return string the HTML converted or empty string if not able to parse
+     */
+    function convert() {
+        // $html = $this->standardizeNewlines($this->html);
+        $output = '';
+        $success = $this->document->loadHTML($this->html);
+        if ($success) {
+            $output = $this->render($this->document);
+
+            // Trim each line
+            $lines = explode("\n", trim($output));
+            foreach ($lines as $index => $line) {
+                $lines[$index] = trim($line);
+            }
+            $output = implode("\n", $lines);
+        }
+        return $output;
+    }
+
+    /**
+     * Standardize newlines into one convention. (Unix)
+     *
+     * @param string text text with any number of \r, \r\n and \n combinations
+     *
+     * @return string the fixed text
+     */
+    private function standardizeNewlines($text) {
+        $text = str_replace("\r\n", "\n", $text);
+        $text = str_replace("\r", "\n", $text);
+        return $text;
+    }
+
+    /**
+     * Render a node
+     *
+     * @param \DOMNode $node      Dom Node
+     * @param bool     $preceeded Preceded by a sibling block element
+     *
+     * @return string
+     */
+    private function render(\DOMNode $node, $preceeded = false) {
+        $output = '';
+        $tag = $node->nodeName;
+        $lastChild = '';
+        // echo $node->nodeName. "\n";
+        if ($tag == '#text') {
+            // Convert two or more white space characters into a single
+            $output = preg_replace('/\s/u', ' ', $node->wholeText);
+            $output = preg_replace('/\s{2,}/u', ' ', $output);
+            // $output = preg_replace("/[\\t\\n\\v\\f\\r ]+/im", " ", $node->wholeText);
+        } elseif ($node instanceof DOMDocumentType) {
+            $output = "";
+        } else {
+            $children = $node->childNodes;
+            if ($children !== null && $children->length > 0) {
+                $precededByBlock = false;
+                foreach ($children as $child) {
+                    $name = $child->nodeName;
+                    if (!in_array($name, $this->ignoreTags)) {
+                        $output .= $this->render($child, $precededByBlock);
+                        $lastChild = $name;
+                        $precededByBlock = $this->isBlock($name);
+                    }
+                }
+            }
+        }
+        $output = $this->prefix($node, $preceeded) . $output
+            .  $this->postFix($node, $lastChild);
+        return $output;
+    }
+
+    /**
+     * Determines prefix for tag
+     *
+     * @param DOMNode $node      Dom Node
+     * @param bool    $preceeded This element is preceeded by another block.
+     *
+     * @return string
+     */
+    private function prefix($node, $preceeded = false) {
+        $name = strtolower($node->nodeName);
+        $output = '';
+        switch ($name) {
+            case "li":
+                $output = ' * ';
+                break;
+            case "h1":
+            case "h2":
+            case "h3":
+            case "h4":
+            case "h5":
+            case "h6":
+                $output = "\n\n";
+                break;
+            case "tr":
+            case 'p':
+                $output = "\n";
+                break;
+            case "div":
+                if (!$preceeded) {
+                    $output = "\n";
+                }
+                break;
+            case "a":
+                // links are returned in [text](link) format
+                $href = $node->getAttribute("href");
+                if ($node->getAttribute("name") != null) {
+                    $output = "[";
+                } elseif ($href !== null) {
+                    $text = $node->textContent;
+                    if ($href !== $text
+                        && $href !== "mailto:$text"
+                        && $href !== "http://$text"
+                        && $href !== "https://$text"
+                    ) {
+                        $output = '[';
+                    }
+                }
+                break;
+            default:
+                $output = "";
+                break;
+        }
+        return $output;
+    }
+
+    /**
+     * Determines postfix for node
+     *
+     * @param DOMNode $node Dom Node
+     *
+     * @return string
+     */
+    private function postFix($node) {
+        $name = strtolower($node->nodeName);
+        $output = '';
+        switch ($name) {
+            case "hr":
+                $output = "------\n";
+                break;
+
+            case "h1":
+            case "h2":
+            case "h3":
+            case "h4":
+            case "h5":
+            case "h6":
+            case "tr":
+            case "br":
+            case "p":
+                $output = "\n";
+                break;
+
+            case "div":
+                $output = "\n";
+                break;
+            case "td":
+                $output = ' ';
+                break;
+
+            case "a":
+                // links are returned in [text](link) format
+                $href = $node->getAttribute("href");
+                if ($href == null) {
+                    // it doesn't link anywhere
+                    if ($node->getAttribute("name") != null) {
+                        $output = "]";
+                    }
+                } else {
+                    $text = $node->textContent;
+                    if ($href == $text
+                        || $href == "mailto:$text"
+                        || $href == "http://$text"
+                        || $href == "https://$text"
+                    ) {
+                        // link to the same address: just use link
+                        $output = '';
+                    } else {
+                        // replace it
+                        $output = "](" . $href . ")";
+                    }
+                }
+                break;
+            default:
+                $output = "";
+                break;
+        }
+
+        return $output;
+    }
+
+    /**
+     * Is this a block level tag?
+     *
+     * @param string $tag tag name
+     *
+     * @return bool
+     */
+    private function isBlock($tag) {
+        return in_array($tag, $this->blockElements);
+    }
+}
