@@ -4,7 +4,7 @@
  *
  * PHP version 5.3
  *
- * @category Colorizr
+ * @category html2Text
  * @package default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
@@ -20,7 +20,7 @@ use HtmlToText;
  *
  * What does this class do?
  *
- * @category tests\lib
+ * @category html2Text
  * @package default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/

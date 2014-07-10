@@ -8,7 +8,7 @@
  *
  * PHP version 5.3
  *
- * @category Colorizr
+ * @category html2Text
  * @package  Default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
@@ -25,7 +25,7 @@ namespace HtmlToText;
  *
  * PHP version 5.3
  *
- * @category Colorizr
+ * @category html2Text
  * @package  Default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
@@ -42,7 +42,7 @@ class HtmlToText {
     private $document = null;
 
     // Ignore these tags
-    private $ignoreTags = array("style", "head", "title", "meta", "script",
+    private $ignoreTags = array('style', 'head', 'title', 'meta', 'script',
         'canvas', 'embed', 'video', 'audio');
     private $blockElements = array('article', 'header', 'aside',
         'hgroup', 'blockquote', 'hr', 'li', 'map', 'ol', 'caption', 'output',
@@ -107,34 +107,35 @@ class HtmlToText {
         $output = '';
         $tag = $node->nodeName;
         $lastChild = '';
-        // echo $node->nodeName. "\n";
         if ($tag == '#text') {
             // Convert two or more white space characters into a single
             $output = $this->cleanText($node->wholeText);
-            // $output = preg_replace("/[\\t\\n\\v\\f\\r ]+/im", " ", $node->wholeText);
         } elseif ($node instanceof \DOMDocumentType) {
-            $output = "";
+            $output = '';
         } else {
             $children = $node->childNodes;
+            // If this has children
             if ($children !== null && $children->length > 0) {
                 $precededByBlock = false;
                 foreach ($children as $child) {
-                    $name = $child->nodeName;
-                    if (!in_array($name, $this->ignoreTags)) {
+                    // What child are we looking at?
+                    $childName = $child->nodeName;
+                    // If this is one we aren't ignoring, let's process
+                    if (!in_array($childName, $this->ignoreTags)) {
+                        // Render the child
                         $output .= $this->render($child, $precededByBlock);
-                        $lastChild = $name;
-                        $precededByBlock = $this->isBlock($name);
+                        $lastChild = $childName;
+                        $precededByBlock = $this->isBlock($childName);
                     }
                 }
             }
         }
-        $output = $this->prefix($node, $preceded)
+        return $this->prefix($node, $preceded)
             . $output
-            .  $this->postFix(
+            . $this->postFix(
                 $node,
                 ($this->isBlock($lastChild) && $this->isBlock($tag))
             );
-        return $output;
     }
 
     /**
@@ -149,44 +150,44 @@ class HtmlToText {
         $name = strtolower($node->nodeName);
         $output = '';
         switch ($name) {
-            case "li":
+            case 'li':
                 $output = ' * ';
                 break;
-            case "h1":
-            case "h2":
-            case "h3":
-            case "h4":
-            case "h5":
-            case "h6":
+            case 'h1':
+            case 'h2':
+            case 'h3':
+            case 'h4':
+            case 'h5':
+            case 'h6':
                 $output = "\n\n";
                 break;
-            case "tr":
+            case 'tr':
             case 'p':
                 $output = "\n";
                 break;
-            case "div":
+            case 'div':
                 if (!$preceded) {
                     $output = "\n";
                 }
                 break;
-            case "a":
+            case 'a':
                 // links are returned in [text](link) format
-                $href = $node->getAttribute("href");
-                if ($node->getAttribute("name") != null) {
-                    $output = "[";
+                $href = $node->getAttribute('href');
+                if ($node->getAttribute('name') != null) {
+                    $output = '[';
                 } elseif ($href !== null) {
                     $text = $node->textContent;
                     if ($href !== $text
-                        && $href !== "mailto:$text"
-                        && $href !== "http://$text"
-                        && $href !== "https://$text"
+                        && $href !== 'mailto:$text'
+                        && $href !== 'http://$text'
+                        && $href !== 'https://$text'
                     ) {
                         $output = '[';
                     }
                 }
                 break;
             default:
-                $output = "";
+                $output = '';
                 break;
         }
         return $output;
@@ -204,55 +205,55 @@ class HtmlToText {
         $name = strtolower($node->nodeName);
         $output = '';
         switch ($name) {
-            case "hr":
+            case 'hr':
                 $output = "------\n";
                 break;
 
-            case "h1":
-            case "h2":
-            case "h3":
-            case "h4":
-            case "h5":
-            case "h6":
-            case "tr":
-            case "br":
-            case "p":
-            case "div":
+            case 'h1':
+            case 'h2':
+            case 'h3':
+            case 'h4':
+            case 'h5':
+            case 'h6':
+            case 'tr':
+            case 'br':
+            case 'p':
+            case 'div':
                 if (!$parented) {
                     $output = "\n";
                 }
                 break;
 
-            case "td":
+            case 'td':
                 $output = ' ';
                 break;
 
-            case "a":
+            case 'a':
                 // links are returned in [text](link) format
-                $href = $node->getAttribute("href");
+                $href = $node->getAttribute('href');
                 if ($href == null) {
                     // it doesn't link anywhere
-                    if ($node->getAttribute("name") != null) {
-                        $output = "]";
+                    if ($node->getAttribute('name') != null) {
+                        $output = ']';
                     }
                 } else {
                     $text = $node->textContent;
                     if ($href == $text
-                        || $href == "mailto:$text"
-                        || $href == "http://$text"
-                        || $href == "https://$text"
+                        || $href == 'mailto:$text'
+                        || $href == 'http://$text'
+                        || $href == 'https://$text'
                     ) {
                         // link to the same address: just use link
                         $output = '';
                     } else {
                         // replace it
-                        $output = "](" . $href . ")";
+                        $output = '](' . $href . ')';
                     }
                 }
                 break;
 
             default:
-                $output = "";
+                $output = '';
                 break;
         }
 
