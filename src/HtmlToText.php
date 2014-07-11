@@ -147,7 +147,7 @@ class HtmlToText {
         $output = '';
         switch ($name) {
             case 'li':
-                $output = ' * ';
+                $output = '* ';
                 break;
             case 'h1':
             case 'h2':
@@ -158,6 +158,9 @@ class HtmlToText {
                 $output = "\n\n";
                 break;
             case 'tr':
+            case 'ol':
+            case 'ul':
+            case 'li':
             case 'p':
                 $output = "\n";
                 break;
@@ -212,6 +215,9 @@ class HtmlToText {
             case 'h5':
             case 'h6':
             case 'tr':
+            case 'ul':
+            case 'ol':
+            case 'li':
             case 'br':
             case 'p':
             case 'div':

@@ -48,7 +48,8 @@ class HtmlToTextTest extends \PHPUnit_Framework_TestCase {
              array("test3"),
              array("test4"),
              array("breaking"),
-             array("more-anchors")
+             array("more-anchors"),
+             array("list")
         );
     }
 
