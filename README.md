@@ -1,5 +1,5 @@
 #HtmlToText
-[![Build Status](https://travis-ci.org/apt142/html2text.svg?branch=master)](https://travis-ci.org/apt142/html2text)
+[![Build Status](https://travis-ci.org/apt142/HtmlToText.svg?branch=master)](https://travis-ci.org/apt142/HtmlToText)
 
 html2text is a very simple script that uses PHP's DOM methods to load from HTML,
  and then iterates over the resulting DOM to output plain text.
