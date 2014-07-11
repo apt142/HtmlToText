@@ -4,7 +4,7 @@
  *
  * PHP version 5.3
  *
- * @category html2Text
+ * @category HtmlToText
  * @package default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
@@ -20,7 +20,7 @@ use HtmlToText;
  *
  * What does this class do?
  *
- * @category html2Text
+ * @category HtmlToText
  * @package default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
@@ -49,7 +49,8 @@ class HtmlToTextTest extends \PHPUnit_Framework_TestCase {
              array("test4"),
              array("breaking"),
              array("more-anchors"),
-             array("list")
+             array("list"),
+             array("table")
         );
     }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * htmlToText Converter
+ * HtmlToText Converter
  *
  * This is a derivative work of this repo: https://github.com/soundasleep/html2text
  *
@@ -8,7 +8,7 @@
  *
  * PHP version 5.3
  *
- * @category html2Text
+ * @category HtmlToText
  * @package  Default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
@@ -25,7 +25,7 @@ namespace HtmlToText;
  *
  * PHP version 5.3
  *
- * @category html2Text
+ * @category HtmlToText
  * @package  Default
  * @author   Cris Bettis <apt142@apartment142.com>
  * @license  CC BY-NC-SA http://creativecommons.org/licenses/by-nc-sa/3.0/
@@ -47,8 +47,9 @@ class HtmlToText {
     private $blockElements = array('article', 'header', 'aside',
         'hgroup', 'blockquote', 'hr', 'li', 'map', 'ol', 'caption', 'output',
         'p', 'pre', 'dd', 'progress', 'div', 'section', 'dl', 'table', 'dt',
-        'tbody', 'embed', 'textarea', 'fieldset', 'tfoot', 'figcaption',
-        'footer', 'tr', 'form', 'ul', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6');
+        'tbody', 'thead', 'tfoot', 'embed', 'textarea', 'fieldset', 'tfoot',
+        'figcaption', 'footer', 'tr', 'form', 'ul', 'h1', 'h2', 'h3', 'h4',
+        'h5', 'h6');
 
     /**
      * Constructor
@@ -84,11 +85,25 @@ class HtmlToText {
         if ($success) {
             $output = trim($this->render($this->document));
 
-            // Trim each line
-            $lines = array_map('trim', explode("\n", $output));
-            $output = implode("\n", $lines);
+            // Post clean up
+            $output = $this->postCleanUp($output);
         }
         return $output;
+    }
+
+    /**
+     * Post Clean up work
+     *
+     * @param string $output Output to clean up
+     *
+     * @return string
+     */
+    private function postCleanUp($output) {
+        // Trim each line
+        $lines = array_map('trim', explode("\n", $output));
+        // Clean each line
+        $lines = array_map(array($this, 'cleanText'), $lines);
+        return implode("\n", $lines);
     }
 
     /**
@@ -157,7 +172,7 @@ class HtmlToText {
             case 'h6':
                 $output = "\n\n";
                 break;
-            case 'tr':
+            case 'table':
             case 'ol':
             case 'ul':
             case 'li':
@@ -227,7 +242,8 @@ class HtmlToText {
                 break;
 
             case 'td':
-                $output = ' ';
+            case 'th':
+                $output = ' | ';
                 break;
 
             case 'a':
