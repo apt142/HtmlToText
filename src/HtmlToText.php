@@ -174,9 +174,9 @@ class HtmlToText {
                 } elseif ($href !== null) {
                     $text = $node->textContent;
                     if ($href !== $text
-                        && $href !== 'mailto:$text'
-                        && $href !== 'http://$text'
-                        && $href !== 'https://$text'
+                        && $href !== 'mailto:' . $text
+                        && $href !== 'http://' . $text
+                        && $href !== 'https://' . $text
                     ) {
                         $output = '[';
                     }
@@ -235,9 +235,9 @@ class HtmlToText {
                 } else {
                     $text = $node->textContent;
                     if ($href == $text
-                        || $href == 'mailto:$text'
-                        || $href == 'http://$text'
-                        || $href == 'https://$text'
+                        || $href == 'mailto:' . $text
+                        || $href == 'http://' . $text
+                        || $href == 'https://' . $text
                     ) {
                         // link to the same address: just use link
                         $output = '';
