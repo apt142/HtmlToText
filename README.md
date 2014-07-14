@@ -52,7 +52,7 @@ You can use [Composer](http://getcomposer.org/) to add the [package](https://pac
 ```json
 {
   "require": {
-    "apt142/html2text": "~0.1.0"
+    "apt142/html2text": "dev-master"
   }
 }
 ```
