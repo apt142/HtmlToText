@@ -22,6 +22,6 @@
     "squizlabs/php_codesniffer": "1.*"
   },
   "autoload": {
-    "files": ["src/HtmlToText.php"]
+    "psr-0": {"HtmlToText\\": "src/"}
   }
 }
