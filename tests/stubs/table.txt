@@ -1,4 +1,4 @@
-Col 1 | Col 2 | Col 3 | Col 4 |
-Foot 1 | Foot 2 | Foot 3 | Foot 4 |
-Data 1-1 | Data 1-2 | Data 1-3 | Data 1-4 |
-Data 2-1 | Data 2-2 | Data 2-3 | Data 2-4 |
+Col 1 Col 2 Col 3 Col 4
+Foot 1 Foot 2 Foot 3 Foot 4
+Data 1-1 Data 1-2 Data 1-3 Data 1-4
+Data 2-1 Data 2-2 Data 2-3 Data 2-4

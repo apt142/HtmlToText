@@ -245,7 +245,7 @@ class HtmlToText {
 
             case 'td':
             case 'th':
-                $output = ' | ';
+                $output = ' ';
                 break;
 
             case 'a':
