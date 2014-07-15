@@ -81,7 +81,9 @@ class HtmlToText {
      */
     function convert() {
         $output = '';
+        libxml_use_internal_errors(true);
         $success = $this->document->loadHTML($this->html);
+        libxml_clear_errors();
         if ($success) {
             $output = trim($this->render($this->document));
 
